@@ -3,7 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
@@ -23,6 +25,11 @@
 	
 	<context:component-scan base-package="org.zerock.controller" />
 	
+	<!-- 업로드 처리 시 multipartResolver 사용 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver">  
+	</beans:bean>
 	
+	<security:global-method-security pre-post-annotations="enabled" secured-annotations="enabled"/>  <!-- security, root context 와 혼동 주의 --> 
+	<!-- security Namespaces 추가 시 spring-security.xsd 버전 확인 -->
 	
 </beans:beans>

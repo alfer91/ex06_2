@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+		
+	<bean id="customAccessDenied" class="org.zerock.security.CustomAccessDeniedHandler"></bean>  <!-- bean 등록 -->
+	<bean id="customLoginSuccess" class="org.zerock.security.CustomLoginSuccessHandler"></bean>
+	<!-- <bean id="customPasswordEncoder" class="org.zerock.security.CustomNoOpPasswordEncoder"></bean> -->
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
+	<bean id="customUserDetailsService" class="org.zerock.security.CustomUserDetailsService"></bean>
+
+	<security:http> <!-- <security:http auto-config="true" use-expressions="false"> 단순 문자열만 이용 -->
+	
+		<security:intercept-url pattern="/sample/all" access="permitAll"/>  <!-- 표현식 이용(기본 설정) -->
+		<security:intercept-url pattern="/sample/member" access="hasRole('ROLE_MEMBER')"/>
+		<security:intercept-url pattern="/sample/admin" access="hasRole('ROLE_ADMIN')"/>
+		
+		
+		<!-- <security:access-denied-handler error-page="/accessError"/> -->  <!-- error-page 를 불러오지만 URI 는 /sample/admin -->
+		<security:access-denied-handler ref="customAccessDenied"/>  <!-- 접근 제한 처리 : AccessDeniedHandler 직접 구현 or 특정 URI 지정 -->
+
+		<!-- <security:form-login/> -->  <!-- 기본 로그인 페이지 -->
+		<security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>  <!-- 로그인 페이지 지정, AuthenticationSuccessHandler 직접 구현 -->
+		
+		<security:logout logout-url="/customLogout" invalidate-session="true" delete-cookies="remember-me,JSESSION_ID"/>  <!-- 로그아웃, 세션 무효화, 쿠키 삭제 -->
+		
+		<security:remember-me data-source-ref="dataSource" token-validity-seconds="604800"/>  <!-- 자동으로 persistence_logins 테이블에 로그인 정보가 생성&삭제됨, 쿠키 유효기간 7일 -->
+		
+		<!-- <security:csrf disabled="true"/> -->  <!-- 일반적으로 CSRF 토큰은 세션을 통해 보관, CSRF 토큰 생성 비활성화, 쿠키를 이용해서 처리하는 설정 지원 -->
+	</security:http>
+	
+	<security:authentication-manager>  <!-- AuthenticationManager 인증을 담당하는 매니저  -->
+		
+		<security:authentication-provider user-service-ref="customUserDetailsService">  <!-- UserDetailsService 직접 구현  -->
+			
+			<!-- <security:password-encoder ref="customPasswordEncoder"/> -->  <!-- 5버전부터 NoOpPasswordEncoder Deprecated 됨, PasswordEncoder 사용 -->
+			<security:password-encoder ref="bcryptPasswordEncoder"/>  
+			<!-- bcrypt : 태생 자체가 패스워드를 저장하는 용도로 설계된 해시 함수로 특정 문자열을 암호화, 
+			체크하는 쪽에서는 암호화 된 패스워드가 가능한 패스워드인지만 확인하고 다시 원문으로 되돌리지는 못함 -->			
+		</security:authentication-provider>
+	
+	</security:authentication-manager>
+</beans>

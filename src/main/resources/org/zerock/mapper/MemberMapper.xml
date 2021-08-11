@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.mapper.MemberMapper">
+
+	<resultMap type="org.zerock.domain.MemberVO" id="memberMap">  <!-- Mybatis 의 ResultMap 을 이용하여 1+N 관계 Join 데이터를 처리  -->
+		<id property="userid" column="userid"/>
+		<result property="userid" column="userid"/>
+		<result property="userpw" column="userpw"/>
+		<result property="userName" column="username"/>
+		<result property="regDate" column="regdate"/>
+		<result property="updateDate" column="updatedate"/>
+		<collection property="authList" resultMap="authMap">  <!-- AuthVO 를 받음 -->
+		</collection>
+	</resultMap>
+	
+	<resultMap type="org.zerock.domain.AuthVO" id="authMap">
+		<result property="userid" column="userid"/>
+		<result property="auth" column="auth"/>
+	</resultMap>
+	
+	<select id="read" resultMap="memberMap">  <!-- column 에선 authList 빠짐 -->
+		select mem.userid, userpw, username, enabled, regdate, updatedate, auth
+		from tbl_member mem LEFT OUTER JOIN tbl_member_auth auth on mem.userid = auth.userid
+		where mem.userid = #{userid}
+	</select>
+</mapper>
