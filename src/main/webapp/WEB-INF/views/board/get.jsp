@@ -1,7 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <%@include file="../includes/header.jsp"%>
 
@@ -96,9 +96,18 @@
 					<label>Writer</label> <input class="form-control" name="writer"
 						value='<c:out value="${board.writer}"/>' readonly="readonly">
 				</div>
-
-				<button data-oper='modify' class="btn btn-default"
-					onclick="location.href='/board/modify?bno=<c:out value="${board.bno}"/>'">Modify</button>
+				
+				<sec:authentication property="principal" var="pinfo"/>
+				
+				<sec:authorize access="isAuthenticated()">
+				
+					<c:if test="${pinfo.username eq board.writer }">
+						<button data-oper='modify' class="btn btn-default"
+							onclick="location.href='/board/modify?bno=<c:out value="${board.bno}"/>'">Modify</button>
+					</c:if>
+					
+				</sec:authorize>
+				
 				<button data-oper='list' class="btn btn-info"
 					onclick="location.href='/board/list'">List</button>
 					
