@@ -115,6 +115,9 @@
 				return true;
 			}
 			
+			var csrfHeaderName = "${_csrf.headerName}";  /* X-CSRF-TOKEN */
+			var csrfTokenValue = "${_csrf.token}";
+			
 			$("input[type='file']").change(function(e) {
 				
 				var formData = new FormData();
@@ -136,6 +139,9 @@
 					url: '/uploadAjaxAction',
 					processData: false,
 					contentType: false,
+					beforeSend: function(xhr) {  // xhr: XMLHttpRequest, 게시물 등록 시 첨부파일의 처리
+						xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+					},
 					data: formData,
 					type: 'POST',
 					dataType: 'json',
@@ -197,6 +203,9 @@
 				$.ajax({
 					url: '/deleteFile',
 					data: {fileName: targetFile, type: type},
+					beforeSend : function(xhr) {  // 첨부파일의 제거
+						xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
+					},
 					dataType: 'text',
 					type: 'POST',
 					success: function(result){

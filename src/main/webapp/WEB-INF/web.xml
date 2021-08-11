@@ -40,7 +40,7 @@
 	</servlet-mapping>
 
 	<filter>
-		<filter-name>encoding</filter-name>
+		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter
 		</filter-class>
 		<init-param>
@@ -50,8 +50,8 @@
 	</filter>
 
 	<filter-mapping>
-		<filter-name>encoding</filter-name>
-		<servlet-name>appServlet</servlet-name>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>  <!-- servlet-name -> url-pattern 변경해줘야 한글처리됨 -->
 	</filter-mapping>
 	
 	<filter>
