@@ -22,7 +22,10 @@
 		<security:access-denied-handler ref="customAccessDenied"/>  <!-- 접근 제한 처리 : AccessDeniedHandler 직접 구현 or 특정 URI 지정 -->
 
 		<!-- <security:form-login/> -->  <!-- 기본 로그인 페이지 -->
-		<security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/>  <!-- 로그인 페이지 지정, AuthenticationSuccessHandler 직접 구현 -->
+		<!-- <security:form-login login-page="/customLogin" authentication-success-handler-ref="customLoginSuccess"/> -->  <!-- 로그인 페이지 지정, AuthenticationSuccessHandler 직접 구현 -->
+		<security:form-login login-page="/customLogin"/>  <!-- 스프링 시큐리티는 기본적으로 로그인 후 처리를 SavedRequestAwareAuthenticationSuccessHandler 클래스 이용,
+															   해당 클래스는 사용자가 원래 보려고 했던 페이지의 정보를 유지해서 로그인 후에 다시 원했던 페이지로 이동하는 방식 -->
+		
 		
 		<security:logout logout-url="/customLogout" invalidate-session="true" delete-cookies="remember-me,JSESSION_ID"/>  <!-- 로그아웃, 세션 무효화, 쿠키 삭제 -->
 		
