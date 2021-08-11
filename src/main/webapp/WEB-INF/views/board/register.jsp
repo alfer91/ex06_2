@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <%@include file="../includes/header.jsp" %>
 
@@ -19,6 +20,7 @@
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<form action="/board/register" method="post">
+							<input type="hidden" name="${_csrf.parameterName }" value="${_csrf.token }">  <!-- CSRF 토큰 설정 -->
 								<div class="form-group">
 									<label>Title</label> <input class="form-control" name="title">
 								</div>
@@ -28,7 +30,8 @@
 								</div>
 
 								<div class="form-group">
-									<label>Writer</label> <input class="form-control" name="writer">
+									<label>Writer</label> <input class="form-control" name="writer" value='<sec:authentication property="principal.username"/>' readonly>
+									<!-- 게시물 작성 시 로그인한 사용자의 아이디 출력, 스프링 시큐리티에서는 username 이 사용자의 아이디 -->
 								</div>
 								
 								<button type="submit" class="btn btn-btn-default">Submit Button</button>

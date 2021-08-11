@@ -55,7 +55,7 @@
 	</filter-mapping>
 	
 	<filter>
-		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-name>springSecurityFilterChain</filter-name>  <!-- 스프링 시큐리티 한글 처리, CharacterEncodingFilter 와 필터 순서 주의 -->
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 	</filter>
 	
