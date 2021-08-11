@@ -266,16 +266,31 @@
 		var modalRemoveBtn = $("#modalRemoveBtn");
 		var modalRegisterBtn = $("#modalRegisterBtn");
 		
+		var replyer = null;
+		
+		<sec:authorize access="isAuthenticated()">
+    		replyer = '<sec:authentication property="principal.username"/>';
+    	</sec:authorize>
+    	
+    	var csrfHeaderName = "${_csrf.headerName}";
+    	var csrfTokenValue = "${_csrf.token}";
+		
 		/* 댓글 모달 창 버튼 */
 		$("#addReplyBtn").on("click", function(e) {
 			
 			modal.find("input").val("");
+			modal.find("input[name='replyer']").val(replyer).attr('disabled','disabled');  // 현재 로그인한 사용자의 이름으로 replyer 항목 고정
 			modalInputReplyDate.closest("div").hide();
 			modal.find("button[id != 'modalCloseBtn']").hide();
 			
 			modalRegisterBtn.show();
 			
 			$(".modal").modal("show");
+		});
+		
+		//Ajax spring security header...
+		$(document).ajaxSend(function(e, xhr, options) {  // 기본설정으로 지정해서 사용, 모든 Ajax 전송 시 CSRF 토큰을 같이 전송
+			xhr.setRequestHeader(csrfHeaderName, csrfTokenValue);
 		});
 		
 		/* 댓글 모달 창 댓글 추가 버튼 */
@@ -313,7 +328,7 @@
 			replyService.get(rno, function(reply) {
 				
 				modalInputReply.val(reply.reply);
-				modalInputReplyer.val(reply.replyer);
+				modalInputReplyer.val(reply.replyer).attr('disabled', 'disabled');
 				modalInputReplyDate.val(replyService.displayTime(reply.replyDate)).attr("readonly", "readonly");
 				modal.data("rno", reply.rno);				
 				
@@ -327,7 +342,23 @@
 		
 		/* 댓글 모달 창 댓글 수정 버튼 */
 		modalModBtn.on("click", function(e) {
-			var reply = {rno : modal.data("rno"), reply: modalInputReply.val()};
+			
+			var originalReplyer = modalInputReplyer.val();
+			
+			var reply = {
+					rno : modal.data("rno"), 
+					reply: modalInputReply.val(),
+					replyer: originalReplyer		
+			};
+			
+			console.log("Original Replyer: " + originalReplyer);
+			
+			if(replyer != originalReplyer) {
+				
+				alert("자신이 작성한 댓글만 수정이 가능합니다.");
+				modal.modal("hide");
+				return;
+			}
 			
 			replyService.update(reply, function(result) {
 				alert(result);
@@ -340,7 +371,27 @@
 		 modalRemoveBtn.on("click", function(e) {
 			 var rno = modal.data("rno");
 			 
-			 replyService.remove(rno, function(result) {
+			 console.log("RNO: " + rno);
+			 console.log("REPLYER: " + replyer);
+			 
+			 if(!replyer) {
+				 alert("로그인후 삭제가 가능합니다.");
+				 modal.modal("hide");
+				 return;
+			 }
+			 
+			 var originalReplyer = modalInputReplyer.val();
+			 
+			 console.log("Original Replyer: " + originalReplyer);  // 댓글의 원래 작성자
+			 
+			 if(replyer != originalReplyer) {
+				 
+				 alert("자신이 작성한 댓글만 삭제가 가능합니다.");
+				 modal.modal("hide");
+				 return;
+			 }
+			 
+			 replyService.remove(rno, originalReplyer, function(result) {
 				 alert(result);
 				 modal.modal("hide");
 				 showList(pageNum);   /* 페이지 번호 유지 */
